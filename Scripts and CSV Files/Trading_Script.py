@@ -208,7 +208,7 @@ def daily_results(chatgpt_portfolio, cash):
     if isinstance(chatgpt_portfolio, pd.DataFrame):
             chatgpt_portfolio = chatgpt_portfolio.to_dict(orient="records")
     print(f"prices and updates for {today}")
-    for stock in chatgpt_portfolio + [{"ticker": "^RUT"}] + [{"ticker": "IWO"}] + [{"ticker": "XBI"}]:
+    for stock in chatgpt_portfolio + [{"ticker": "^NSEI"}]:
         ticker = stock['ticker']
         try:
             data = yf.download(ticker, period="2d", progress=False)
@@ -219,7 +219,7 @@ def daily_results(chatgpt_portfolio, cash):
         except Exception as e:
             raise KeyError(f"Download for {ticker} failed. Try checking internet connection.")
         print(f"{ticker} closing price: {price:.2f}")
-        print(f"{ticker} volume for today: ${volume:,}")
+        print(f"{ticker} volume for today: ₹{volume:,}")
         print(f"percent change from the day before: {percent_change:.2f}%")
     chatgpt_df = pd.read_csv("Scripts and CSV Files/chatgpt_portfolio_update.csv")
 
@@ -230,35 +230,35 @@ def daily_results(chatgpt_portfolio, cash):
     final_value = chatgpt_totals[chatgpt_totals['Date'] == final_date]
     final_equity = float(final_value['Total Equity'].values[0])
     print(final_equity)
-    print(f"Latest ChatGPT Equity: ${final_equity:.2f}")
+    print(f"Latest ChatGPT Equity: ₹{final_equity:.2f}")
 
-# Define start and end date for Russell 2000
+# Define start and end date for Nifty 50
 
-# Get Russell 2000 data
-    russell = yf.download("^RUT", start="2025-06-27", end=final_date + pd.Timedelta(days=1), progress=False)
-    russell = russell.reset_index()[["Date", "Close"]]
+# Get Nifty 50 data
+    nifty = yf.download("^NSEI", start="2025-06-27", end=final_date + pd.Timedelta(days=1), progress=False)
+    nifty = nifty.reset_index()[["Date", "Close"]]
 
 
-# Normalize to $100
-    initial_price = russell["Close"].iloc[0].item()
-    price_now = russell["Close"].iloc[-1].item()
-    scaling_factor = 100 / initial_price
-    russell_value = price_now * scaling_factor
-    print(f"$100 Invested in the Russell 2000 Index: ${russell_value:.2f}")
+# Normalize to ₹10000
+    initial_price = nifty["Close"].iloc[0].item()
+    price_now = nifty["Close"].iloc[-1].item()
+    scaling_factor = 10000 / initial_price
+    nifty_value = price_now * scaling_factor
+    print(f"₹10000 Invested in the Nifty 50 Index: ₹{nifty_value:.2f}")
     print(f"today's portfolio: {chatgpt_portfolio}")
     print(f"cash balance: {cash}")
 
-    
+
 
 # === Run Portfolio ===
 today = datetime.today().strftime('%Y-%m-%d')
-chatgpt_portfolio = [{'ticker': 'ABEO', 'shares': 6, 'stop_loss': 4.9, 'buy_price': 5.77, 'cost_basis': 34.62},
-                    {'ticker': 'IINN', 'shares': 14, 'stop_loss': 1.1, 'buy_price': 1.5, 'cost_basis': 21.0}, 
-                    {'ticker': 'ACTU', 'shares': 6, 'stop_loss': 4.89, 'buy_price': 5.75, 'cost_basis': 34.5},
+chatgpt_portfolio = [{'ticker': 'SUZLON.NS', 'shares': 100, 'stop_loss': 40.0, 'buy_price': 45.0, 'cost_basis': 4500.0},
+                    {'ticker': 'YESBANK.NS', 'shares': 200, 'stop_loss': 15.0, 'buy_price': 20.0, 'cost_basis': 4000.0},
+                    {'ticker': 'IDEA.NS', 'shares': 300, 'stop_loss': 10.0, 'buy_price': 12.0, 'cost_basis': 3600.0},
                     ]
 chatgpt_portfolio = pd.DataFrame(chatgpt_portfolio)
 # === TODO ===
 #nothing
 
-cash = 22.32
+cash = 1000.0
 daily_results(chatgpt_portfolio, cash)
